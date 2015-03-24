@@ -6,7 +6,7 @@ Icarus
 Installation
 ------------
 
-1. Fork this repo
+1. [Fork](https://help.github.com/articles/fork-a-repo/) this repo
 
 2. Clone that repo
 
@@ -38,6 +38,11 @@ Build the app for distribution
 ```bash
 gulp
 ```
+
+Contributing to Icarus
+----------------------
+
+Once you've made some changes on a branch, submit a [Pull Request](https://help.github.com/articles/using-pull-requests/) and your changes will be reviewed.  Keep related changes in a branch, and submit it as a single pull request.
 
 Questions?
 ----------
