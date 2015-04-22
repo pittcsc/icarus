@@ -1,50 +1,53 @@
-Icarus
-======
+# Icarus
 
-> Voting System for Pitt CSC Talks and Workshops
+This README outlines the details of collaborating on this Ember application.
+A short introduction of this app could easily go here.
 
-Installation
-------------
+## Prerequisites
 
-1. [Fork](https://help.github.com/articles/fork-a-repo/) this repo
+You will need the following things properly installed on your computer.
 
-2. Clone that repo
+* [Git](http://git-scm.com/)
+* [Node.js](http://nodejs.org/) (with NPM)
+* [Bower](http://bower.io/)
+* [Ember CLI](http://www.ember-cli.com/)
+* [PhantomJS](http://phantomjs.org/)
 
-    ```bash
-    git clone git@github.com:__your_username__/icarus.git
-    ```
+## Installation
 
-3. Install dependencies
+* `git clone <repository-url>` this repository
+* change into the new directory
+* `npm install`
+* `bower install`
 
-    ```bash
-    npm install
-    bower install
-    ```
+## Running / Development
 
-    If you don't have them already, you'll need [npm](https://www.npmjs.com/) and [bower](http://bower.io/) installed as well
+* `ember server`
+* Visit your app at [http://localhost:4200](http://localhost:4200).
 
+### Code Generators
 
-Development
------------
+Make use of the many generators for code, try `ember help generate` for more details
 
-Run the development server
+### Running Tests
 
-```bash
-gulp serve
-```
+* `ember test`
+* `ember test --server`
 
-Build the app for distribution
+### Building
 
-```bash
-gulp
-```
+* `ember build` (development)
+* `ember build --environment production` (production)
 
-Contributing to Icarus
-----------------------
+### Deploying
 
-Once you've made some changes on a branch, submit a [Pull Request](https://help.github.com/articles/using-pull-requests/) and your changes will be reviewed.  Keep related changes in a branch, and submit it as a single pull request.
+Specify what it takes to deploy your app.
 
-Questions?
-----------
+## Further Reading / Useful Links
 
-Contact [Alex LaFroscia](http://twitter.com/alexlafroscia).
+* [ember.js](http://emberjs.com/)
+* [ember-cli](http://www.ember-cli.com/)
+* Development Browser Extensions
+  * [ember inspector for chrome](https://chrome.google.com/webstore/detail/ember-inspector/bmdblncegkenkacieihfhpjfppoconhi)
+  * [ember inspector for firefox](https://addons.mozilla.org/en-US/firefox/addon/ember-inspector/)
+
