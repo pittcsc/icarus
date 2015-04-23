@@ -7,7 +7,6 @@ export default Ember.Controller.extend({
   actions: {
     connect: function() {
       var socket = this.get('socket');
-      console.debug(socket);
     }
   }
 

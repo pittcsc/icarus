@@ -7,12 +7,14 @@ export default Ember.Service.extend({
   // Store the Socket.io connection
   connection: null,
 
-  init: function() {
-    console.log('test');
-    const socket = io(`${config.apiURL}/socket.io/`);
-    socket.on('connect', () => {
-      alert('connection established!');
-      this.set('connection', socket);
+  // Called from an initializer to ensure that the socket connection exists
+  // before allowing the JS app to boot
+  setup: function() {
+    return new Ember.RSVP.Promise((resolve) => {
+      var socket = io(config.apiURL);
+      socket.on('connection', function() {
+        resolve();
+      });
     });
   }
 
