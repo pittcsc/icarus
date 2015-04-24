@@ -3,7 +3,7 @@ import Ember from 'ember';
 export default Ember.Route.extend({
 
   model: function() {
-    this.store.find('talk');
+    return this.store.find('talk');
   }
 
 });

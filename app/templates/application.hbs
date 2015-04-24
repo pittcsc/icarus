@@ -2,4 +2,8 @@
 
 {{outlet}}
 
-<button {{action 'connect'}}>Connect!</button>
+{{#each talk in model}}
+  <div class="talk">
+    {{talk.title}}
+  </div>
+{{/each}}
