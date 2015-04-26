@@ -1,6 +1,5 @@
 import Ember from 'ember';
 import config from '../config/environment';
-import io from 'npm:socket.io-client';
 
 export default Ember.Service.extend({
 

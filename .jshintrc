@@ -3,7 +3,7 @@
     "document",
     "window",
     "-Promise",
-    "io"
+    "Websocket"
   ],
   "browser": true,
   "boss": true,
