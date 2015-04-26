@@ -1,7 +1,9 @@
 export default class Message {
   constructor(options) {
-    options = JSON.parse(options);
-    this.id = options.id;
+    if (typeof options === 'string') {
+      options = JSON.parse(options);
+    }
+    this.id = parseInt(options.id);
     this.type = options.type;
     this.body = options.body;
   }
