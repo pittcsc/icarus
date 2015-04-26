@@ -5,7 +5,7 @@ module.exports = function(environment) {
     modulePrefix: 'icarus',
     environment: environment,
     baseURL: '/',
-    apiURL: 'http://localhost:5000',
+    apiURL: 'localhost:5000',
     locationType: 'auto',
     EmberENV: {
       FEATURES: {

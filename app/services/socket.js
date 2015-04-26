@@ -1,23 +1,6 @@
 import Ember from 'ember';
 import config from '../config/environment';
-
-class Message {
-  constructor(options) {
-    options = JSON.parse(options);
-    this.id = options.id;
-    this.type = options.type;
-    this.body = options.body;
-  }
-
-  toJSON() {
-    const json = {
-      id: this.id,
-      type: this.type,
-      body: this.body
-    };
-    return JSON.stringify(json);
-  }
-}
+import Message from '../utils/message';
 
 export default Ember.Service.extend({
 
@@ -30,10 +13,23 @@ export default Ember.Service.extend({
   // before allowing the JS app to boot
   setup: function() {
     return new Ember.RSVP.Promise((resolve) => {
-      var socket = new Websocket(`ws://${config.apiURL}/socket/`);
-      socket.on('connection', function() {
-        resolve();
-      });
+      var socket = new WebSocket(`ws://${config.apiURL}/socket/`);
+
+      socket.onclose = function() {
+        // Do something to unsubscribe from messages
+      };
+
+      socket.onmessage = (evt) => {
+        const msg = new Message(evt.data);
+        const cb = this.get('events')[msg.type][msg.id];
+        if (cb !== null) {
+          cb();
+        }
+      };
+
+      this.set('connection', socket);
+
+      resolve();
 
     });
   },
@@ -46,6 +42,12 @@ export default Ember.Service.extend({
   off: function(type, id) {
     const events = this.get('events');
     events[type][id] = null;
+  },
+
+  send: function(data) {
+    const connection = this.get('connection');
+    const msg = new Message(data);
+    connection.send(msg.toJSON());
   }
 
 });
