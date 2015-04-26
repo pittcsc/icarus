@@ -1,0 +1,29 @@
+<section>
+  <header>
+    <h1>Talks</h1>
+    <p>We have talks at each of our weekly meetings. They’re usually about 15 minutes long…</p>
+  </header>
+
+  {{#each talk in model}}
+    <article>
+      <a href="#">
+        <span class="title">{{talk.title}}</span>
+        <span class="creator">Alex L.</span>
+      </a>
+    </article>
+  {{/each}}
+</section>
+
+<section>
+  <header>
+    <h1>Workshops</h1>
+    <p>Workshops happen outside of our weekly meetings, and delve deeper into topics that interest us. They can be up to two hours long.</p>
+  </header>
+
+  {{#each talk in model}}
+    <article>
+      <a href="#" class="title">{{talk.title}}</a>
+      <span class="creator">Alex L.</span>
+    </article>
+  {{/each}}
+</section>
