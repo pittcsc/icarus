@@ -7,6 +7,7 @@ export default Ember.Service.extend({
   // Store the Socket.io connection
   connection: null,
 
+  // Store table of events and IDs
   events: {},
 
   // Called from an initializer to ensure that the socket connection exists
@@ -21,14 +22,18 @@ export default Ember.Service.extend({
 
       socket.onmessage = (evt) => {
         const msg = new Message(evt.data);
-        const cb = this.get('events')[msg.type][msg.id];
+        var cb;
+        try {
+          cb = this.get('events')[msg.type][msg.id];
+        } catch (e) {
+          return;
+        }
         if (cb !== null) {
           cb();
         }
       };
 
       this.set('connection', socket);
-
       resolve();
 
     });
@@ -36,6 +41,7 @@ export default Ember.Service.extend({
 
   on: function(type, id, cb) {
     const events = this.get('events');
+    events[type] = events[type] || {};
     events[type][id] = cb;
   },
 
