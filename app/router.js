@@ -6,4 +6,8 @@ var Router = Ember.Router.extend({
 });
 
 export default Router.map(function() {
+  this.route('talks', function() {
+    this.route('talk', {path: ':id'});
+  });
+  this.route('workshops');
 });
