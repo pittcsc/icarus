@@ -1,9 +1,6 @@
-import {
-  moduleForComponent,
-  test
-} from 'ember-qunit';
+import {moduleForComponent, test} from 'ember-qunit';
 
-moduleForComponent('talk-list-item', {
+moduleForComponent('event-list-item', {
   // Specify the other units that are required for this test
   // needs: ['component:foo', 'helper:bar']
 });
