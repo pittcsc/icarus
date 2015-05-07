@@ -35,10 +35,8 @@ export default Ember.Service.extend({
         } catch (e) {
           return;
         }
-        // Callback could be null, if the object was deleted
-        if (cb !== null) {
-          cb();
-        }
+        cb = cb || function() { };
+        cb();
       };
 
       this.set('connection', socket);
