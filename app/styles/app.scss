@@ -1,3 +1,7 @@
-@import "settings";
+// Import variables
+// All other files will have access to them
+@import "vars";
 
-@import "foundation";
+// Import Components
+@import "components/nav";
+
