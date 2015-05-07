@@ -1,3 +1,4 @@
+import Ember from 'ember';
 import DS from 'ember-data';
 
 export default DS.Model.extend({
@@ -6,9 +7,14 @@ export default DS.Model.extend({
   upvotes: DS.attr('number'),
   downvotes: DS.attr('number'),
 
-  totalvotes: function() {
-    return this.get('upvotes') - this.get('downvotes');
-  }.property('upvotes', 'downvotes'),
+  /**
+   * Total, combined vote count
+   * @property totalVotes
+   * @type {Number}
+   */
+  totalvotes: Ember.computed('upvotes', 'downvotes', {
+    get: () => this.get('upvotes') - this.get('downvotes')
+  }),
 
   setupSocketEvents: function() {
     this.socket.on('upvote-talk', this.get('id'), () => {
