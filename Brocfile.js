@@ -2,11 +2,8 @@
 
 var EmberApp = require('ember-cli/lib/broccoli/ember-app');
 
-//Includes the core foundation.js with the tab, topbar, orbit and dropdown module
 var app = new EmberApp({
-  'ember-cli-foundation-sass': {
-    'foundationJs': ['topbar']
-  }
+
 });
 
 // Use `app.import` to add additional libraries to the generated
