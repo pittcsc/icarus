@@ -13,7 +13,9 @@ export default DS.Model.extend({
    * @type {Number}
    */
   totalvotes: Ember.computed('upvotes', 'downvotes', {
-    get: () => this.get('upvotes') - this.get('downvotes')
+    get: function() {
+     return this.get('upvotes') - this.get('downvotes');
+    }
   }),
 
   setupSocketEvents: function() {

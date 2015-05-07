@@ -65,6 +65,7 @@ export default Ember.Service.extend({
     const connection = this.get('connection');
     const msg = new Message(data);
     connection.send(msg.toJSON());
+    return Ember.RSVP.resolve();
   }
 
 });

@@ -1,9 +1,13 @@
-<h4>{{link-to title 'talks.talk' attrs.talk}}</h4>
+<div class="voting-arrows">
+  <i class="arrow fa fa-arrow-up {{if isUpvoted 'active'}}" {{action 'upvote'}}></i>
+  <i class="arrow fa fa-arrow-down {{if isDownvoted 'active'}}" {{action 'downvote'}}></i>
+</div>
 
-Upvotes: {{attrs.talk.upvotes}}
-Downvotes: {{attrs.talk.downvotes}}
+<div class="text">
+  <h4>{{link-to title 'talks.talk' attrs.event}}</h4>
+</div>
 
-<button {{action 'upvote'}}>Vote!</button>
-
-<hr />
-
+<div class="score">
+  <span>{{score}}</span><br />
+  Score
+</div>

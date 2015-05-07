@@ -1,0 +1,47 @@
+.event-list-item {
+  // === Self-Properties === //
+
+  background-color: $white;
+  border-bottom: 1px solid tint($black, 80%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+
+  // === Child Elements === //
+
+  .voting-arrows {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 25px;
+  }
+
+  .text {
+    flex: 3;
+    align-self: flex-start;
+
+    h4 {
+      font-size: 2em;
+      margin: 0;
+    }
+  }
+
+  .score {
+    text-align: center;
+
+    span {
+      font-size: 2em;
+    }
+  }
+
+  // === Sub-Components === //
+
+  .arrow {
+    cursor: pointer;
+    &:hover, &.active {
+      color: $sun;
+    }
+  }
+
+}
+

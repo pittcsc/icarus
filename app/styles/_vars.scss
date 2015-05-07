@@ -1,2 +1,20 @@
-$primary-color: 'black';
+
+// Pallete: Reach for the Sun
+// http://www.colourlovers.com/palette/3510980/Reach_for_the_Sun
+$night-sky: #30374A;
+$ocean: #00807A;
+$looks-like-fun: #60B389;
+$spring: #A6CA8E;
+$sun: #D4D055;
+
+// Set theme
+$primary-color: $looks-like-fun;
+$secondary-color: $spring;
+
+// Set base colors
+$black: $night-sky;
+$white: white;
+
+// UI Elements
+$background-color: $ocean;
 

@@ -5,6 +5,24 @@
 // All other files will have access to them
 @import "vars";
 
+// Layout
+@import "layout";
+
 // Import Components
+@import "components/event-list-item";
 @import "components/nav";
 
+// Shared Styles
+html, body {
+  background-color: $background-color;
+  color: $night-sky;
+}
+
+a {
+  color: $secondary-color;
+  text-decoration: none;
+
+  &:hover {
+    color: $sun;
+  }
+}

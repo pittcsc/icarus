@@ -1,15 +1,5 @@
-<div class="row">
-  <div class="small-12 columns">
-
-    <section>
-      <header>
-        <h1>Talks</h1>
-        <p>We have talks at each of our weekly meetings. They’re usually about 15 minutes long…</p>
-      </header>
-
-      {{#each model as |talk|}}
-        {{event-list-item talk=talk}}
-      {{/each}}
-    </section>
-  </div>
+<div class="container">
+  {{#each model as |talk|}}
+    {{event-list-item event=talk}}
+  {{/each}}
 </div>
