@@ -21,13 +21,17 @@ module.exports = function(environment) {
 
     contentSecurityPolicy: {
       'default-src': "'none'",
-      'script-src': "'self'",
+      'script-src': "'self' 'unsafe-inline' http://cdn.mxpnl.com",
       'font-src': "'self'",
-      'connect-src': "'self'",
+      'connect-src': "'self' http://api.mixpanel.com",
       'img-src': "'self'",
       'style-src': "'self' 'unsafe-inline",
       'frame-src': ""
-    }
+    },
+
+    // Mixpanel Config
+    MIXPANEL_TOKEN: process.env.ICARUS_MIXPANEL_TOKEN
+
   };
 
   if (environment === 'development') {
