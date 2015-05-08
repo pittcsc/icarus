@@ -4,13 +4,15 @@ This project is meant to be a playground for trying out future Ember features an
 
 Unfortunately, there is no way to programmatically check for these styles, but that's what the code review process is for!
 
-## General Syntax
+## JavaScript
+
+### General Syntax
 
 - No trailing white space
 - 2-space tabs
 - Always use `''` around strings instead of `""`
 
-## Ember-Specific Style
+### Ember-Specific Style
 
 - Don't use the boolean interpretation of a variable in a situation where you want to determine if something is present.  Instead, use Ember's helper methods that do the same
 
@@ -26,7 +28,7 @@ Unfortunately, there is no way to programmatically check for these styles, but t
     }
     ```
 
-## ES6 Style Features
+### ES6 Style Features
 
 - Do not make aliases for `this` when the context changes.  Instead, use a "fat arrow" function
 
@@ -64,6 +66,7 @@ Unfortunately, there is no way to programmatically check for these styles, but t
       }
     }
     ```
+
 - Always use template strings instead of concatination
 
     ```js
@@ -78,3 +81,7 @@ Unfortunately, there is no way to programmatically check for these styles, but t
     const fullName = `${firstName} ${lastName}`;
     ```
 
+## Git
+
+- Please keep commits small (break large changes into logical groupings of related code, in order to make reverting changes easy)
+- Please include detailed commit messages, and commit notes wherever necessary
