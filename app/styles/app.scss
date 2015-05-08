@@ -14,17 +14,5 @@
 @import "components/footer";
 @import "components/nav";
 
-// Shared Styles
-html, body {
-  background-color: $background-color;
-  color: $night-sky;
-}
-
-a {
-  color: $secondary-color;
-  text-decoration: none;
-
-  &:hover {
-    color: $sun;
-  }
-}
+// Base Styles
+@import "base";
