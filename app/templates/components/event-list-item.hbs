@@ -1,10 +1,12 @@
-<div class="voting-arrows">
-  <i class="arrow fa fa-arrow-up {{if isUpvoted 'active'}}" {{action 'upvote'}}></i>
-  <i class="arrow fa fa-arrow-down {{if isDownvoted 'active'}}" {{action 'downvote'}}></i>
-</div>
+{{voting-arrows
+    isUpvoted=isUpvoted
+    isDownvoted=isDownvoted
+    upvoteAction='upvote'
+    downvoteAction='downvote'}}
 
 <div class="text">
   <h4>{{link-to title 'talk' attrs.event}}</h4>
+  <p>Cras quis eros eget felis fringilla mollis sit amet id nulla. Class aptent taciti sociosqu ad litora torquent per conubia.</p>
 </div>
 
 <div class="score">

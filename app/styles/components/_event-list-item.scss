@@ -39,14 +39,5 @@
     }
   }
 
-  // === Sub-Components === //
-
-  .arrow {
-    cursor: pointer;
-    &:hover, &.active {
-      color: $sun;
-    }
-  }
-
 }
 

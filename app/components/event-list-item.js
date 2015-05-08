@@ -50,7 +50,7 @@ export default Ember.Component.extend({
     /**
      * Cast a positive vote for an event
      */
-    upvote: function() {
+    upvote() {
       const talk = this.get('event');
       this.get('socket').send({
         id: talk.id,
@@ -63,7 +63,7 @@ export default Ember.Component.extend({
     /**
      * Cast a negative vote for an event
      */
-    downvote: function() {
+    downvote() {
       const talk = this.get('event');
       this.get('socket').send({
         id: talk.id,

@@ -1,0 +1,10 @@
+.voting-arrows {
+
+  .arrow {
+    cursor: pointer;
+    &:hover, &.active {
+      color: $sun;
+    }
+  }
+}
+
