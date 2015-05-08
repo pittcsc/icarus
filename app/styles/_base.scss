@@ -1,0 +1,16 @@
+// Shared Styles
+html, body {
+  background-color: $background-color;
+  color: $night-sky;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: $secondary-color;
+  text-decoration: none;
+
+  &:hover {
+    color: $sun;
+  }
+}

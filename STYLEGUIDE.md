@@ -4,6 +4,11 @@ This project is meant to be a playground for trying out future Ember features an
 
 Unfortunately, there is no way to programmatically check for these styles, but that's what the code review process is for!
 
+## General Development
+
+- Whenever possible, keep lists of things in alphabetical order.  This includes hash elements, CSS styles, etc.
+- When importing from another file, keep the import path as short as possible.  This is particularly relevant to Sass imports; use the `sassOptions` in the `Brocfile` to add import paths to libraries.
+
 ## JavaScript
 
 ### General Syntax
@@ -80,6 +85,11 @@ Unfortunately, there is no way to programmatically check for these styles, but t
     const lastName = 'LaFroscia'
     const fullName = `${firstName} ${lastName}`;
     ```
+
+## Sass
+
+- Write style mobile-first, using media queries to override styles for larger screens, not smaller ones
+- Always write styles in a component file (whether or not that corresponds to an Ember component) and include it into the main `app.scss`
 
 ## Git
 
