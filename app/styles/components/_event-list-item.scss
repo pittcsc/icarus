@@ -18,11 +18,16 @@
 
   .text {
     flex: 3;
-    align-self: flex-start;
 
     h4 {
       font-size: 2em;
       margin: 0;
+    }
+
+    p {
+      margin: 0;
+      color: $grey;
+      font-size: 1.1em;
     }
   }
 
