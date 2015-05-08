@@ -20,6 +20,16 @@ You will need the following things properly installed on your computer.
 * `npm install`
 * `bower install`
 
+## Config
+
+If you want Mixpanel tracking to work in development, just set an environment variable of `ICARUS_MIXPANEL_TOKEN` like so:
+
+```bash
+export ICARUS_MIXPANEL_TOKEN=__some_mixpanel_token__
+```
+
+If the token is not present, tracking will just be ignored.
+
 ## Running / Development
 
 * `ember server`
