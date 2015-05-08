@@ -3,9 +3,31 @@ import DS from 'ember-data';
 
 export default DS.Model.extend({
 
+  socket: Ember.inject.service(),
+
   title: DS.attr('string'),
   upvotes: DS.attr('number'),
   downvotes: DS.attr('number'),
+
+  /**
+   * Track user's voting status
+   * @property voteValue
+   * @type {Number}
+   * @default 0
+   */
+  voteValue: 0,
+
+  isUpvoted: Ember.computed('voteValue', {
+    get: function() {
+      return this.get('voteValue') === 1;
+    }
+  }),
+
+  isDownvoted: Ember.computed('voteValue', {
+    get: function() {
+      return this.get('voteValue') === -1;
+    }
+  }),
 
   /**
    * Total, combined vote count
@@ -27,5 +49,23 @@ export default DS.Model.extend({
 
   teardownSocketEvents: function() {
     this.socket.off('upcote-talk', this.get('id'));
-  }.on('didDelete')
+  }.on('didDelete'),
+
+  upvote() {
+    this.get('socket').send({
+      id: this.get('id'),
+      type: 'upvote-talk'
+    }).then(() => {
+      this.set('voteValue', 1);
+    });
+  },
+
+  downvote() {
+    this.get('socket').send({
+      id: this.get('id'),
+      type: 'downvote-talk'
+    }).then(() => {
+      this.set('voteValue', -1);
+    });
+  }
 });
