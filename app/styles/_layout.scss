@@ -1,6 +1,13 @@
 // Layout styles that don't quite fit anywhere else
 
 div.container {
+  box-sizing: border-box;
   margin: 0 auto;
-  width: 80%;
+  padding: 0px 10px;
+  width: 100%;
+
+  @include breakpoint($tablet) {
+    width: 80%;
+    max-width: 900px;
+  }
 }
