@@ -33,6 +33,44 @@ Unfortunately, there is no way to programmatically check for these styles, but t
     }
     ```
 
+- All method and properties should be documented using [YUIDoc](http://yui.github.io/yuidoc/).
+- There should be one line of whitespace before the first comment when defining a new class
+- There should be one line of whitespace between consecutive sets of closing curly braces
+- Property and method definitions should have two lines of whitespace between them
+
+    ```js
+    // BAD
+    class Person {
+      name: '',
+      greet() {
+        return `Hello, my name is ${this.name}`;
+      }
+    }
+
+    // GOOD
+    class Person {
+
+      /**
+       * The name of the person
+       * @property name
+       * @type {String}
+       * @default ''
+       */
+      name: '',
+
+
+      /**
+       * Greet another person
+       * @method greet
+       * @return {String}
+       */
+      greet() {
+        return `Hello, my name is ${this.name}`;
+      }
+
+    }
+    ```
+
 ### ES6 Style Features
 
 - Do not make aliases for `this` when the context changes.  Instead, use a "fat arrow" function
