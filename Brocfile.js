@@ -4,6 +4,11 @@ var EmberApp = require('ember-cli/lib/broccoli/ember-app');
 var pickFiles = require('broccoli-static-compiler');
 
 var app = new EmberApp({
+  sassOptions: {
+    includePaths: [
+      'bower_components/breakpoint-sass/stylesheets'
+    ]
+  },
   sourcemaps: {
     enabled: true,
     extensions: ['js', 'scss']

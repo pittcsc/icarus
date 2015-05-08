@@ -18,5 +18,8 @@
   "resolutions": {
     "ember": "canary",
     "ember-data": "canary"
+  },
+  "devDependencies": {
+    "breakpoint-sass": "~2.5.0"
   }
 }
