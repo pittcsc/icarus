@@ -1,4 +1,7 @@
 .voting-arrows {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 25px;
 
   .arrow {
     cursor: pointer;

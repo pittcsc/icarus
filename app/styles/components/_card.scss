@@ -2,8 +2,14 @@
   background-color: $white;
   padding: $padding-amount;
 
-  & > h1:first-child {
-    margin-top: 5px;
+  .header {
+    display: flex;
+    align-items: center;
+
+    > h1 {
+      margin: 5px 0;
+    }
   }
+
 }
 

@@ -1,6 +1,13 @@
 <div class="container">
   <div class="card">
-    <h1>{{model.title}}</h1>
+    <div class="header">
+      {{voting-arrows
+          isUpvoted=model.isUpvoted
+          isDownvoted=model.isDownvoted
+          upvoteAction='upvote'
+          downvoteAction='downvote'}}
+      <h1>{{model.title}}</h1>
+    </div>
 
     <p>
       Nulla ultricies finibus felis vitae vestibulum. Ut quis purus auctor, eleifend erat sed, rhoncus enim. Vivamus varius odio ut mollis vehicula. Pellentesque nibh lorem, tristique eu ultrices eu, dignissim sed purus. Vestibulum sagittis dolor ac lectus pharetra, eu congue nunc sollicitudin. Phasellus ornare ex at libero dapibus, eu gravida metus ullamcorper. Mauris feugiat venenatis augue, in lobortis turpis accumsan sed. Ut suscipit dignissim libero non placerat. Praesent id est in sapien pulvinar porta vel bibendum ipsum.
