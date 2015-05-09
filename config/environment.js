@@ -30,7 +30,10 @@ module.exports = function(environment) {
     },
 
     // Mixpanel Config
-    MIXPANEL_TOKEN: process.env.ICARUS_MIXPANEL_TOKEN
+    MIXPANEL_TOKEN: process.env.ICARUS_MIXPANEL_TOKEN,
+
+    // Github OAuth Token
+    GITHUB_CLIENT_ID: process.env.ICARUS_GITHUB_CLIENT_ID
 
   };
 
