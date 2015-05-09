@@ -2,24 +2,13 @@ import Ember from 'ember';
 
 export default Ember.Component.extend({
 
-  /**
-   * ==== Attributes ====
-   * Attributes are values that are passed into the compontent through the
-   * template.  You access them using the `attrs` prefix, like so:
-   *
-   *    # JS
-   *    this.get('attrs.name')
-   *
-   *    # HBS
-   *    {{attrs.name}}
-   *
-   * Below is a listing of available attributes on this component
-   *
-   *  event: the talk that this component represents
-   *
-   */
+  event: null,
 
   classNames: ['event-list-item'],
+
+  attributeBindings: ['lid:data-container-id'],
+
+  lid: Ember.computed.alias('event.id'),
 
   title: Ember.computed.alias('event.title'),
   score: Ember.computed.alias('event.totalvotes'),
