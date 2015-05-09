@@ -21,26 +21,6 @@ export default Ember.Component.extend({
 
   classNames: ['event-list-item'],
 
-  /**
-   * Track user's voting status
-   * @property voteValue
-   * @type {Number}
-   * @default 0
-   */
-  voteValue: 0,
-
-  isUpvoted: Ember.computed('voteValue', {
-    get: function() {
-      return this.get('voteValue') === 1;
-    }
-  }),
-
-  isDownvoted: Ember.computed('voteValue', {
-    get: function() {
-      return this.get('voteValue') === -1;
-    }
-  }),
-
   title: Ember.computed.alias('event.title'),
   score: Ember.computed.alias('event.totalvotes'),
 
@@ -50,27 +30,17 @@ export default Ember.Component.extend({
     /**
      * Cast a positive vote for an event
      */
-    upvote: function() {
-      const talk = this.get('event');
-      this.get('socket').send({
-        id: talk.id,
-        type: 'upvote-talk'
-      }).then(() => {
-        this.set('voteValue', 1);
-      });
+    upvote() {
+      const event = this.get('event');
+      event.upvote();
     },
 
     /**
      * Cast a negative vote for an event
      */
-    downvote: function() {
-      const talk = this.get('event');
-      this.get('socket').send({
-        id: talk.id,
-        type: 'downvote-talk'
-      }).then(() => {
-        this.set('voteValue', -1);
-      });
+    downvote() {
+      const event = this.get('event');
+      event.downvote();
     }
   }
 });

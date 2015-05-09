@@ -1,11 +1,12 @@
 # Icarus
 
-This README outlines the details of collaborating on this Ember application.
-A short introduction of this app could easily go here.
+Web browser client for the Icarus project of the Pitt Computer Science Club
 
 ## Prerequisites
 
 You will need the following things properly installed on your computer.
+
+**Programs**
 
 * [Git](http://git-scm.com/)
 * [Node.js](http://nodejs.org/) (with NPM)
@@ -13,35 +14,46 @@ You will need the following things properly installed on your computer.
 * [Ember CLI](http://www.ember-cli.com/)
 * [PhantomJS](http://phantomjs.org/)
 
+**Projects**
+
+* [Icarus Backend](https://github.com/Pitt-CSC/icarus-backend)
+
 ## Installation
 
-* `git clone <repository-url>` this repository
-* change into the new directory
-* `npm install`
-* `bower install`
+1. If you're contributing, fork the repo
+2. `git clone <repository-url>` the repository
+3. change into the new directory
+4. `npm install`
+5. `bower install`
 
-## Running / Development
+## Contributing
+
+We would love to have your help with the project!  If you have ideas for new features, feel free to make an issue here on Github so we can plan things out, and then fork the repo and get to work!  Pull requests with updates and fixes are welcome as well!
+
+Some notes about pull requests: please follow [our styleguide](https://github.com/Pitt-CSC/icarus/blob/master/STYLEGUIDE.md) for information about the code style of the project and what our expectations are.  Contributed code will also not be accepted without tests!
+
+### Ember Commands to Know
 
 * `ember server`
-* Visit your app at [http://localhost:4200](http://localhost:4200).
-
-### Code Generators
-
-Make use of the many generators for code, try `ember help generate` for more details
-
-### Running Tests
-
+    * Visit your app at [http://localhost:4200](http://localhost:4200).
 * `ember test`
-* `ember test --server`
+    * Runs the test suite in the terminal through Phantom.js
+    * Can be run in the browser using `ember test --serve`
+* `ember generate __type__ __name__`
+    * Generate new files in the project
+    * _Always_ use the generators, don't make new files by hand!
 
-### Building
+### Configuration
 
-* `ember build` (development)
-* `ember build --environment production` (production)
+#### Mixpanel Tracking
 
-### Deploying
+If you want Mixpanel tracking to work in development, just set an environment variable of `ICARUS_MIXPANEL_TOKEN` like so:
 
-Specify what it takes to deploy your app.
+```bash
+export ICARUS_MIXPANEL_TOKEN=__some_mixpanel_token__
+```
+
+If the token is not present, tracking will just be ignored.
 
 ## Further Reading / Useful Links
 

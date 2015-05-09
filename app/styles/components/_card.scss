@@ -1,0 +1,16 @@
+.card {
+  background-color: $white;
+  padding: $padding-amount;
+
+  .header {
+    align-items: center;
+    display: flex;
+
+    > h1 {
+      flex-grow: 1;
+      margin: 5px 0;
+    }
+  }
+
+}
+

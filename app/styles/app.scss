@@ -1,28 +1,22 @@
 // Packages
-@import "bourbon";
+@import 'bourbon';
+@import 'breakpoint';
 
 // Import variables
 // All other files will have access to them
-@import "vars";
+@import 'vars';
 
 // Layout
-@import "layout";
+@import 'layout';
 
 // Import Components
-@import "components/event-list-item";
-@import "components/nav";
+@import 'components/card';
+@import 'components/event-list-item';
+@import 'components/footer';
+@import 'components/header';
+@import 'components/nav';
+@import 'components/voting-arrows';
+@import 'components/voting-score';
 
-// Shared Styles
-html, body {
-  background-color: $background-color;
-  color: $night-sky;
-}
-
-a {
-  color: $secondary-color;
-  text-decoration: none;
-
-  &:hover {
-    color: $sun;
-  }
-}
+// Base Styles
+@import 'base';

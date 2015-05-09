@@ -1,47 +1,28 @@
 .event-list-item {
   // === Self-Properties === //
 
+  align-items: center;
   background-color: $white;
   border-bottom: 1px solid tint($black, 80%);
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 15px;
+  padding: $padding-amount;
 
   // === Child Elements === //
 
-  .voting-arrows {
-    display: flex;
-    flex-direction: column;
-    flex-basis: 25px;
-  }
-
   .text {
     flex: 3;
-    align-self: flex-start;
 
     h4 {
       font-size: 2em;
       margin: 0;
     }
-  }
 
-  .score {
-    text-align: center;
-
-    span {
-      font-size: 2em;
+    p {
+      color: $grey;
+      font-size: 1.1em;
+      margin: 0;
     }
   }
-
-  // === Sub-Components === //
-
-  .arrow {
-    cursor: pointer;
-    &:hover, &.active {
-      color: $sun;
-    }
-  }
-
 }
 
