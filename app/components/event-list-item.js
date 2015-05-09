@@ -6,6 +6,10 @@ export default Ember.Component.extend({
 
   classNames: ['event-list-item'],
 
+  attributeBindings: ['lid:data-container-id'],
+
+  lid: Ember.computed.alias('event.id'),
+
   title: Ember.computed.alias('event.title'),
   score: Ember.computed.alias('event.totalvotes'),
 
