@@ -3,10 +3,11 @@
   padding: $padding-amount;
 
   .header {
-    display: flex;
     align-items: center;
+    display: flex;
 
     > h1 {
+      flex-grow: 1;
       margin: 5px 0;
     }
   }

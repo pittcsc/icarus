@@ -1,10 +1,10 @@
 .event-list-item {
   // === Self-Properties === //
 
+  align-items: center;
   background-color: $white;
   border-bottom: 1px solid tint($black, 80%);
   display: flex;
-  align-items: center;
   justify-content: space-between;
   padding: $padding-amount;
 

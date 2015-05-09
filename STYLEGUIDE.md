@@ -128,6 +128,7 @@ Unfortunately, there is no way to programmatically check for these styles, but t
 
 - Write style mobile-first, using media queries to override styles for larger screens, not smaller ones
 - Always write styles in a component file (whether or not that corresponds to an Ember component) and include it into the main `app.scss`
+- Sass files should be linted with [`scss_lint`](https://github.com/brigade/scss-lint).
 
 ## Git
 

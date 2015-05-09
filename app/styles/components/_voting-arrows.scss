@@ -1,11 +1,13 @@
 .voting-arrows {
   display: flex;
-  flex-direction: column;
   flex-basis: 25px;
+  flex-direction: column;
 
   .arrow {
     cursor: pointer;
-    &:hover, &.active {
+
+    &:hover,
+    &.active {
       color: $sun;
     }
   }

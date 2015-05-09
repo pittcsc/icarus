@@ -6,7 +6,7 @@
   width: 100%;
 
   @include breakpoint($tablet) {
-    width: 80%;
     max-width: 900px;
+    width: 80%;
   }
 }
