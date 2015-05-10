@@ -1,7 +1,8 @@
 // Layout styles that don't quite fit anywhere else
 
 .container {
-  border: 14px solid $background-color;
+  border-left: 14px solid $background-color;
+  border-right: 14px solid $background-color;
   box-sizing: border-box;
   margin: 0 auto;
   max-width: 614.4px;

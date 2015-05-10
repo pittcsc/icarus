@@ -8,10 +8,6 @@ var app = new EmberApp({
     includePaths: [
       'bower_components/breakpoint-sass/stylesheets'
     ]
-  },
-  sourcemaps: {
-    enabled: true,
-    extensions: ['js', 'scss']
   }
 });
 

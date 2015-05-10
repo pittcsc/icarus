@@ -14,7 +14,7 @@ export default Ember.Service.extend({
    */
   _available: Ember.computed({
     get: function() {
-      return Ember.isPresent(config.MIXPANEL_TOKEN);
+      return Ember.isPresent(config.MIXPANEL_TOKEN) && config.MIXPANEL_ENABLE;
     }
   }),
 
