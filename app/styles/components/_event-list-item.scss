@@ -8,22 +8,29 @@
   justify-content: space-between;
   padding: $padding-amount;
 
-  // === Child Elements === //
-
   .text {
-    flex: 3;
+    flex: 1;
 
     h1,
     h4 {
-      font-size: 2em;
+      font-size: 1.5em;
       margin: 0;
+
+      @include breakpoint($medium) {
+        font-size: 1.8em;
+      }
     }
 
     p {
       color: $grey;
-      font-size: 1.1em;
+      font-size: .9em;
       margin: 0;
+
+      @include breakpoint($medium) {
+        font-size: 1em;
+      }
     }
   }
+
 }
 
