@@ -3,9 +3,16 @@
     {{link-to 'Icarus' 'index'}}
   </div>
 
-  <div class="login">
-    <a href="#" {{action 'login'}}>Login <i class="fa fa-caret-down"></i></a>
-  </div>
+  {{#if session.isAuthenticated}}
+    <div class="login">
+      <a href="#">{{session.user.firstName}} <i class="fa fa-caret-down"></i></a>
+    </div>
+  {{else}}
+    <div class="login">
+      <a href="#" {{action 'login'}}>Login</a>
+    </div>
+  {{/if}}
+
 </header>
 
 <nav>
