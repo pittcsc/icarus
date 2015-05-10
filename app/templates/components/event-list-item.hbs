@@ -1,9 +1,11 @@
-{{voting-arrows
-    lid=event.id
-    isUpvoted=event.isUpvoted
-    isDownvoted=event.isDownvoted
-    upvoteAction='upvote'
-    downvoteAction='downvote'}}
+{{#if  session.isAuthenticated}}
+  {{voting-arrows
+      lid=event.id
+      isUpvoted=event.isUpvoted
+      isDownvoted=event.isDownvoted
+      upvoteAction='upvote'
+      downvoteAction='downvote'}}
+{{/if}}
 
 <div class="text">
   <h4 data-title-id={{event.id}} class='title'>{{link-to title 'talk' event}}</h4>

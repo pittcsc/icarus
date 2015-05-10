@@ -11,11 +11,15 @@ export default Ember.Component.extend({
   actions: {
 
     upvoteEvent() {
-      this.sendAction('upvoteAction');
+      if (!this.get('isUpvoted')) {
+        this.sendAction('upvoteAction');
+      }
     },
 
     downvoteEvent() {
-      this.sendAction('downvoteAction');
+      if (!this.get('isDownvoted')) {
+        this.sendAction('downvoteAction');
+      }
     }
   }
 });
