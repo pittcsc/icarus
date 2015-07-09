@@ -1,15 +1,17 @@
 import Ember from 'ember';
 
-export function initialize(container) {
-  const track = container.lookup('service:track');
+const { on } = Ember;
+
+export function initialize(instance) {
+  const track = instance.registry.lookup('service:track');
 
   Ember.Router.reopen({
-    trackPageview: function() {
+    trackPageview: on('didTransition', function() {
       track.track('Page View', {
         'Name': document.title,
         'URL': window.location.pathname
       });
-    }.on('didTransition')
+    })
   });
 }
 

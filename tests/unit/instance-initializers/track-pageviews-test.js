@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import { initialize } from '../../../initializers/track-pageviews';
+import { initialize } from '../../../instance-initializers/track-pageviews';
 import { module, test } from 'qunit';
 
 var container, application;
