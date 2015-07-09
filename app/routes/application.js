@@ -1,13 +1,16 @@
 import Ember from 'ember';
-import config from '../config/environment';
+
+const { inject } = Ember;
+const { service } = inject;
 
 export default Ember.Route.extend({
 
+  session: service(),
+
   actions: {
     login() {
-      const clientId = config.GITHUB_CLIENT_ID;
-      const scope = 'user:email';
-      window.location = `https://github.com/login/oauth/authorize?scope=${scope}&client_id=${clientId}`;
+      this.get('session').login();
     }
   }
+
 });

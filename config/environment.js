@@ -4,8 +4,8 @@ module.exports = function(environment) {
   var ENV = {
     modulePrefix: 'icarus',
     environment: environment,
+    firebase: 'https://pittcsc-icarus.firebaseio.com/',
     baseURL: '/',
-    apiURL: 'localhost:5000',
     locationType: 'auto',
     EmberENV: {
       FEATURES: {
@@ -21,12 +21,12 @@ module.exports = function(environment) {
 
     contentSecurityPolicy: {
       'default-src': "'none'",
-      'script-src': "'self' 'unsafe-inline' http://cdn.mxpnl.com",
+      'script-src': "'self' 'unsafe-inline' http://cdn.mxpnl.com https://*.firebaseio.com",
       'font-src': "'self' http://fonts.gstatic.com",
-      'connect-src': "'self' http://api.mixpanel.com",
+      'connect-src': "'self' http://api.mixpanel.com wss://*.firebaseio.com",
       'img-src': "'self'",
       'style-src': "'self' 'unsafe-inline http://fonts.googleapis.com",
-      'frame-src': ""
+      'frame-src': "https://*.firebaseio.com"
     },
 
     // Mixpanel Config
