@@ -22,10 +22,10 @@ module.exports = function(environment) {
     contentSecurityPolicy: {
       'default-src': "'none'",
       'script-src': "'self' 'unsafe-inline' http://cdn.mxpnl.com",
-      'font-src': "'self'",
+      'font-src': "'self' http://fonts.gstatic.com",
       'connect-src': "'self' http://api.mixpanel.com",
       'img-src': "'self'",
-      'style-src': "'self' 'unsafe-inline",
+      'style-src': "'self' 'unsafe-inline http://fonts.googleapis.com",
       'frame-src': ""
     },
 
