@@ -5,7 +5,7 @@
 
   {{#if session.isAuthenticated}}
     <div class="login">
-      <a href="#">{{session.user.firstName}} <i class="fa fa-caret-down"></i></a>
+      <a href="#">{{session.currentUser.fullName}} <i class="fa fa-caret-down"></i></a>
     </div>
   {{else}}
     <div class="login">
