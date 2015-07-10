@@ -1,11 +1,8 @@
-import {
-  moduleForModel,
-  test
-} from 'ember-qunit';
+import { moduleForModel, test } from 'ember-qunit';
 
-moduleForModel('talk', {
+moduleForModel('talk', 'Unit | Model | talk', {
   // Specify the other units that are required for this test.
-  needs: []
+  needs: ['model:vote', 'model:user']
 });
 
 test('it exists', function(assert) {

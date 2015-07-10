@@ -1,5 +1,7 @@
 # Icarus
 
+[![Build Status](https://travis-ci.org/Pitt-CSC/icarus.svg?branch=master)](https://travis-ci.org/Pitt-CSC/icarus)
+
 Web browser client for the Icarus project of the Pitt Computer Science Club
 
 ## Prerequisites
