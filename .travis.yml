@@ -16,7 +16,7 @@ install:
 script:
 - npm test
 after_success:
-- npm build
+- ember build
 - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && bash deploy.sh
 env:
   global:
