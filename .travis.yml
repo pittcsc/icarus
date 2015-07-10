@@ -1,23 +1,23 @@
----
 language: node_js
 node_js:
-  - "0.12"
-
+- '0.12'
 sudo: false
-
 cache:
   directories:
-    - node_modules
-
+  - node_modules
 before_install:
-  - export PATH=/usr/local/phantomjs-2.0.0/bin:$PATH<F37>const
-  - "npm config set spin false"
-  - "npm install -g npm@^2"
-
+- export PATH=/usr/local/phantomjs-2.0.0/bin:$PATH
+- npm config set spin false
+- npm install -g npm@^2
 install:
-  - npm install -g bower
-  - npm install
-  - bower install
-
+- npm install -g bower
+- npm install
+- bower install
 script:
-  - npm test
+- npm test
+after_success:
+- npm build
+- test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && bash deploy.sh
+env:
+  global:
+    secure: e25iIdehr1eZ1mtyeJdNFXBcl40HkT626ZR8LnGF/1LmfYYWByj4ebcHPDM73ITwlcCZ+g/3fF+FOudPcoIgLAppX+mnAo5LzBVqHsHPnwR6FHk0DNuwza84v+j1P/LR09T5ywo01ukd79RFdPaVUr44Ixioh2grz6ecS6IaOa4=
