@@ -1,0 +1,117 @@
+@import url(http://fonts.googleapis.com/css?family=Arimo);
+.container {
+  border-left: 14px solid #00807a;
+  border-right: 14px solid #00807a;
+  box-sizing: border-box;
+  margin: 0 auto;
+  max-width: 614.4px;
+  width: 100%; }
+  @media screen and (min-width: 768px) {
+    .container {
+      max-width: 900px;
+      width: 80%; } }
+
+.card {
+  background-color: #fff;
+  padding: 15px; }
+  .card .header {
+    align-items: center;
+    display: flex; }
+    .card .header > h1 {
+      color: #a6ca8e;
+      flex-grow: 1;
+      margin: 5px 0; }
+
+.event-list-item {
+  align-items: center;
+  background-color: #fff;
+  border-bottom: 1px solid #d6d7db;
+  display: flex;
+  justify-content: space-between;
+  padding: 15px; }
+  .event-list-item .text {
+    flex: 1; }
+    .event-list-item .text h1,
+    .event-list-item .text h4 {
+      font-size: 1.5em;
+      margin: 0; }
+      @media screen and (min-width: 614px) {
+        .event-list-item .text h1,
+        .event-list-item .text h4 {
+          font-size: 1.7em; } }
+    .event-list-item .text p {
+      color: #343434;
+      font-size: .9em;
+      margin: 0; }
+      @media screen and (min-width: 614px) {
+        .event-list-item .text p {
+          font-size: 1em; } }
+
+footer {
+  font-size: .8em;
+  padding: 10px 0;
+  text-align: center; }
+  @media screen and (min-width: 614px) {
+    footer {
+      font-size: .9em; } }
+
+header {
+  align-items: center;
+  display: flex;
+  height: 40px;
+  justify-content: space-between; }
+
+nav {
+  background-color: #60b389; }
+
+.voting-arrows {
+  display: flex;
+  flex-basis: 25px;
+  flex-direction: column; }
+  .voting-arrows .arrow {
+    cursor: pointer; }
+    .voting-arrows .arrow:hover,
+    .voting-arrows .arrow.active {
+      color: #d4d055; }
+
+.score {
+  font-size: .85em;
+  margin-left: 10px;
+  text-align: center; }
+  @media screen and (min-width: 614px) {
+    .score {
+      font-size: 1em; } }
+  .score span {
+    font-size: 2em; }
+
+html,
+body {
+  background-color: #00807a;
+  color: #30374a;
+  font-family: 'Arimo', sans-serif;
+  margin: 0;
+  padding: 0; }
+
+a {
+  color: #a6ca8e;
+  text-decoration: none; }
+  a:hover {
+    color: #d4d055; }
+
+.liquid-container > .title {
+  color: #a6ca8e;
+  font-size: 2em; }
+
+.liquid-container > .voting-arrows,
+.liquid-container > .title {
+  z-index: 101; }
+
+.liquid-container > .voting-score {
+  z-index: 102; }
+
+.liquid-container > .card {
+  z-index: 100; }
+  .liquid-container > .card p {
+    display: none; }
+
+/*# sourceMappingURL=icarus.css.map */
