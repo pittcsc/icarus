@@ -4,11 +4,9 @@
       {{voting-arrows
           lid=model.id
           isUpvoted=model.isUpvoted
-          isDownvoted=model.isDownvoted
-          upvoteAction='upvote'
-          downvoteAction='downvote'}}
+          upvoteAction='upvote'}}
       <h1 data-title-id={{model.id}} class='title'>{{model.title}}</h1>
-      {{voting-score score=model.totalvotes lid=model.id}}
+      {{voting-score score=model.votes.length lid=model.id}}
     </div>
 
     <p>

@@ -6,11 +6,6 @@ export default Ember.Controller.extend({
     upvote() {
       const event = this.get('model');
       event.upvote();
-    },
-
-    downvote() {
-      const event = this.get('model');
-      event.downvote();
     }
   }
 });

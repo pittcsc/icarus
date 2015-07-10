@@ -15,20 +15,12 @@ export default Ember.Component.extend({
   // Event for item, plus properties for event attributes
   event: null,
   title: Ember.computed.alias('event.title'),
-  score: Ember.computed.alias('event.totalvotes'),
+  score: Ember.computed.alias('event.numVotes'),
 
   actions: {
-
-    // Cast a positive vote for an event
     upvote() {
       const event = this.get('event');
-      event.upvote();
-    },
-
-    // Cast a negative vote for an event
-    downvote() {
-      const event = this.get('event');
-      event.downvote();
+      event.toggleVote();
     }
   }
 });

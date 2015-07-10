@@ -9,17 +9,8 @@ export default Ember.Component.extend({
   lid: null,
 
   actions: {
-
-    upvoteEvent() {
-      if (!this.get('isUpvoted')) {
-        this.sendAction('upvoteAction');
-      }
-    },
-
-    downvoteEvent() {
-      if (!this.get('isDownvoted')) {
-        this.sendAction('downvoteAction');
-      }
+    vote() {
+      this.sendAction('toggleVote');
     }
   }
 });
