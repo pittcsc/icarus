@@ -1,7 +1,5 @@
-import {
-  moduleFor,
-  test
-} from 'ember-qunit';
+import Ember from 'ember';
+import { moduleFor, test } from 'ember-qunit';
 
 moduleFor('adapter:application', 'ApplicationAdapter', {
   // Specify the other units that are required for this test.
@@ -10,6 +8,13 @@ moduleFor('adapter:application', 'ApplicationAdapter', {
 
 // Replace this with your real tests.
 test('it exists', function(assert) {
-  var adapter = this.subject();
+  const firebase = Ember.Object.create({
+    ref() {
+      return true;
+    }
+  });
+  var adapter = this.subject({
+    firebase
+  });
   assert.ok(adapter);
 });

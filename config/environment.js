@@ -6,7 +6,7 @@ module.exports = function(environment) {
     environment: environment,
     firebase: process.env.ICARUS_FIREBASE_URL,
     baseURL: '/',
-    locationType: 'auto',
+    locationType: 'hash',
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
