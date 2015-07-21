@@ -4,7 +4,7 @@ module.exports = function(environment) {
   var ENV = {
     modulePrefix: 'icarus',
     environment: environment,
-    firebase: 'https://pittcsc-icarus.firebaseio.com/',
+    firebase: process.env.ICARUS_FIREBASE_URL,
     baseURL: '/',
     locationType: 'auto',
     EmberENV: {
@@ -32,10 +32,6 @@ module.exports = function(environment) {
     // Mixpanel Config
     MIXPANEL_ENABLE: false,
     MIXPANEL_TOKEN: process.env.ICARUS_MIXPANEL_TOKEN,
-
-    // Github OAuth Token
-    GITHUB_CLIENT_ID: process.env.ICARUS_GITHUB_CLIENT_ID
-
   };
 
   if (environment === 'development') {
