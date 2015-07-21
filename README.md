@@ -23,10 +23,16 @@ You will need the following things properly installed on your computer.
 ## Installation
 
 1. If you're contributing, fork the repo
-2. `git clone <repository-url>` the repository
-3. change into the new directory
-4. `npm install`
-5. `bower install`
+2. Create a new Firebase server and set an environment variable to the URL like so:
+
+    ```bash
+    export ICARUS_FIREBASE_URL='https://some-project.firebaseio.com/'
+    ```
+
+3. `git clone <repository-url>` the repository
+4. change into the new directory
+5. `npm install`
+6. `bower install`
 
 ## Contributing
 
