@@ -100545,7 +100545,7 @@ define('emberfire', ['emberfire/index', 'ember', 'exports'], function(__index__,
   }));
 });
 
-define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberfire/utils/to-promise', 'lodash/collection/forEach', 'lodash/collection/filter', 'lodash/collection/map', 'lodash/array/indexOf'], function (exports, Ember, DS, toPromise, forEach, filter, map, indexOf) {
+define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberfire/utils/to-promise', 'lodash/collection/forEach', 'lodash/collection/filter', 'lodash/collection/map', 'lodash/collection/includes', 'lodash/array/indexOf', 'lodash/collection/find'], function (exports, Ember, DS, toPromise, forEach, filter, map, includes, indexOf, find) {
 
   'use strict';
 
@@ -100637,7 +100637,7 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
     */
     findRecord: function findRecord(store, typeClass, id) {
       var adapter = this;
-      var ref = this._getRef(typeClass, id);
+      var ref = this._getCollectionRef(typeClass, id);
 
       return new Promise(function (resolve, reject) {
         ref.once('value', function (snapshot) {
@@ -100664,8 +100664,9 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
     },
 
     recordWillUnload: function recordWillUnload(store, record) {
-      var ref = this._getRef(record.constructor, record.get('id'));
-      ref.off('value');
+      if (record.__listening) {
+        this.stopListening(store, record.constructor, record);
+      }
     },
 
     recordWillDelete: function recordWillDelete(store, record) {
@@ -100676,7 +100677,7 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
           var parentRecord = record.get(relationship.key);
           var inverseKey = record.inverseFor(relationship.key);
           if (inverseKey && parentRecord.get('id')) {
-            var parentRef = adapter._getRef(inverseKey.type, parentRecord.get('id'));
+            var parentRef = adapter._getCollectionRef(inverseKey.type, parentRecord.get('id'));
             adapter._removeHasManyRecord(store, parentRef, inverseKey.name, record.id);
           }
         }
@@ -100684,16 +100685,27 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
     },
 
     listenForChanges: function listenForChanges(store, typeClass, record) {
-      record.__listening = true;
-      var adapter = this;
-      var ref = this._getRef(typeClass, record.get('id'));
-      var called = false;
-      ref.on('value', function FirebaseAdapter$changeListener(snapshot) {
-        if (called) {
-          adapter._handleChildValue(store, typeClass, snapshot);
-        }
-        called = true;
-      });
+      // embedded records will get their changes from parent listeners
+      if (!this.isRecordEmbedded(record)) {
+        record.__listening = true;
+        var adapter = this;
+        var ref = this._getCollectionRef(typeClass, record.id);
+        var called = false;
+        ref.on('value', function FirebaseAdapter$changeListener(snapshot) {
+          if (called) {
+            adapter._handleChildValue(store, typeClass, snapshot);
+          }
+          called = true;
+        });
+      }
+    },
+
+    stopListening: function stopListening(store, typeClass, record) {
+      if (record.__listening) {
+        var ref = this._getCollectionRef(typeClass, record.id);
+        ref.off('value');
+        record.__listening = false;
+      }
     },
 
     /**
@@ -100711,7 +100723,7 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
     */
     findAll: function findAll(store, typeClass) {
       var adapter = this;
-      var ref = this._getRef(typeClass);
+      var ref = this._getCollectionRef(typeClass);
 
       return new Promise(function (resolve, reject) {
         // Listen for child events on the type
@@ -100734,7 +100746,7 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
 
     query: function query(store, typeClass, _query, recordArray) {
       var adapter = this;
-      var ref = this._getRef(typeClass);
+      var ref = this._getCollectionRef(typeClass);
       var modelName = typeClass.modelName;
 
       ref = this.applyQueryToRef(ref, _query);
@@ -100744,9 +100756,9 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
 
         if (!record || !record.__listening) {
           var payload = adapter._assignIdToPayload(snapshot);
-          var serializer = store.serializerFor(modelName);
+          var normalizedData = store.normalize(typeClass.modelName, payload);
           adapter._updateRecordCacheForType(typeClass, payload);
-          record = store.push(modelName, serializer.extractSingle(store, typeClass, payload));
+          record = store.push(normalizedData);
         }
 
         if (record) {
@@ -100866,17 +100878,10 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
       } else {
         var payload = this._assignIdToPayload(snapshot);
 
-        // firebase doesn't send the property for empty relationships
-        typeClass.eachRelationship(function (key, relationship) {
-          if (relationship.kind === 'hasMany' && !payload[key]) {
-            payload[key] = {};
-          }
-        });
-
         this._enqueue(function FirebaseAdapter$enqueueStorePush() {
           if (!store.isDestroying) {
-            var serializer = store.serializerFor(typeClass.modelName);
-            store.push(typeClass.modelName, serializer.extractSingle(store, typeClass, payload));
+            var normalizedData = store.normalize(typeClass.modelName, payload);
+            store.push(normalizedData);
           }
         });
       }
@@ -100888,9 +100893,8 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
     */
     createRecord: function createRecord(store, typeClass, snapshot) {
       var adapter = this;
-      var record = snapshot.record || snapshot;
       return this.updateRecord(store, typeClass, snapshot).then(function () {
-        adapter.listenForChanges(store, typeClass, record);
+        adapter.listenForChanges(store, typeClass, snapshot.record);
       });
     },
 
@@ -100906,19 +100910,18 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
      */
     updateRecord: function updateRecord(store, typeClass, snapshot) {
       var adapter = this;
-      var record = snapshot.record || snapshot;
-      var recordRef = record.__firebaseRef || this._getRef(typeClass, record.get('id'));
-      var recordCache = adapter._getRecordCache(typeClass, record.get('id'));
+      var recordRef = this._getAbsoluteRef(snapshot.record);
+      var recordCache = adapter._getRecordCache(typeClass, snapshot.id);
 
       var pathPieces = recordRef.path.toString().split('/');
       var lastPiece = pathPieces[pathPieces.length - 1];
-      var serializedRecord = record.serialize({
-        includeId: lastPiece !== record.id // record has no firebase `key` in path
+      var serializedRecord = snapshot.serialize({
+        includeId: lastPiece !== snapshot.id // record has no firebase `key` in path
       });
 
       return new Promise(function (resolve, reject) {
         var savedRelationships = Ember['default'].A();
-        record.eachRelationship(function (key, relationship) {
+        snapshot.record.eachRelationship(function (key, relationship) {
           var save;
           if (relationship.kind === 'hasMany') {
             if (serializedRecord[key]) {
@@ -100928,8 +100931,8 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
               delete serializedRecord[key];
             }
           } else {
-            if (relationship.options.embedded === true && serializedRecord[key]) {
-              save = adapter._saveBelongsToRecord(store, typeClass, relationship, serializedRecord[key], recordRef);
+            if (adapter.isRelationshipEmbedded(store, typeClass.modelName, relationship) && serializedRecord[key]) {
+              save = adapter._saveEmbeddedBelongsToRecord(store, typeClass, relationship, serializedRecord[key], recordRef);
               savedRelationships.push(save);
               delete serializedRecord[key];
             }
@@ -100946,7 +100949,7 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
           }
           // Throw an error if any of the relationships failed to save
           if (rejected.length !== 0) {
-            var error = new Error(fmt('Some errors were encountered while saving %@ %@', [typeClass, record.id]));
+            var error = new Error(fmt('Some errors were encountered while saving %@ %@', [typeClass, snapshot.id]));
             error.errors = rejected.mapBy('reason');
             reject(error);
           } else {
@@ -100985,12 +100988,12 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
       });
 
       dirtyRecords = map['default'](uniq(dirtyRecords.concat(addedRecords)), function (id) {
-        return adapter._saveHasManyRecord(store, relationship, recordRef, id);
+        return adapter._saveHasManyRecord(store, typeClass, relationship, recordRef, id);
       });
 
       // Removed
       var removedRecords = filter['default'](idsCache, function (id) {
-        return !ids.contains(id);
+        return !includes['default'](ids, id);
       });
 
       removedRecords = map['default'](removedRecords, function (id) {
@@ -101020,16 +101023,41 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
       named with the record id and update the value to the serialized
       version of the record
     */
-    _saveHasManyRecord: function _saveHasManyRecord(store, relationship, parentRef, id) {
+    _saveHasManyRecord: function _saveHasManyRecord(store, typeClass, relationship, parentRef, id) {
       var ref = this._getRelationshipRef(parentRef, relationship.key, id);
       var record = store.peekRecord(relationship.type, id);
-      var isEmbedded = relationship.options.embedded === true;
+      var isEmbedded = this.isRelationshipEmbedded(store, typeClass.modelName, relationship);
       if (isEmbedded) {
-        record.__firebaseRef = ref;
         return record.save();
       }
 
       return toPromise['default'](ref.set, ref, [true]);
+    },
+
+    /**
+     * Determine from the serializer if the relationship is embedded via the
+     * serializer's `attrs` hash.
+     *
+     * @return {Boolean}              Is the relationship embedded?
+     */
+    isRelationshipEmbedded: function isRelationshipEmbedded(store, modelName, relationship) {
+      var serializer = store.serializerFor(modelName);
+      return serializer.hasDeserializeRecordsOption(relationship.key);
+    },
+
+    /**
+     * Determine from if the record is embedded via implicit relationships.
+     *
+     * @return {Boolean}              Is the relationship embedded?
+     */
+    isRecordEmbedded: function isRecordEmbedded(record) {
+      if (record._internalModel) {
+        record = record._internalModel;
+      }
+
+      var found = this.getFirstEmbeddingParent(record);
+
+      return !!found;
     },
 
     /**
@@ -101041,20 +101069,23 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
     },
 
     /**
-      Save an embedded record
-    */
-    _saveBelongsToRecord: function _saveBelongsToRecord(store, typeClass, relationship, id, parentRef) {
+     * Save an embedded belongsTo record and set its internal firebase ref
+     *
+     * @return {Promise<DS.Model>}
+     */
+    _saveEmbeddedBelongsToRecord: function _saveEmbeddedBelongsToRecord(store, typeClass, relationship, id, parentRef) {
       var record = store.peekRecord(relationship.type, id);
-      record.__firebaseRef = parentRef.child(relationship.key);
-      return record.save();
+      if (record) {
+        return record.save();
+      }
+      return Ember['default'].RSVP.Promise.reject(new Error('Unable to find record with id ' + id + ' from embedded relationship: ' + JSON.stringify(relationship)));
     },
 
     /**
       Called by the store when a record is deleted.
     */
     deleteRecord: function deleteRecord(store, typeClass, snapshot) {
-      var record = snapshot.record || snapshot;
-      var ref = record.__firebaseRef || this._getRef(typeClass, record.get('id'));
+      var ref = this._getAbsoluteRef(snapshot.record);
       return toPromise['default'](ref.remove, ref);
     },
 
@@ -101069,7 +101100,7 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
     /**
       Return a Firebase reference for a given modelName and optional ID.
     */
-    _getRef: function _getRef(typeClass, id) {
+    _getCollectionRef: function _getCollectionRef(typeClass, id) {
       var ref = this._ref;
       if (typeClass) {
         ref = ref.child(this.pathForType(typeClass.modelName));
@@ -101078,6 +101109,58 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
         ref = ref.child(id);
       }
       return ref;
+    },
+
+    /**
+     * Returns a Firebase reference for a record taking into account if the record is embedded
+     *
+     * @param  {DS.Model} record
+     * @return {Firebase}
+     */
+    _getAbsoluteRef: function _getAbsoluteRef(record) {
+      if (record._internalModel) {
+        record = record._internalModel;
+      }
+
+      var embeddingParent = this.getFirstEmbeddingParent(record);
+
+      if (embeddingParent) {
+        var parent = embeddingParent.record;
+        var relationship = embeddingParent.relationship;
+
+        var recordRef = this._getAbsoluteRef(parent).child(relationship.key);
+
+        if (relationship.kind === 'hasMany') {
+          recordRef = recordRef.child(record.id);
+        }
+        return recordRef;
+      }
+
+      return this._getCollectionRef(record.type, record.id);
+    },
+
+    /**
+     * Returns the parent record and relationship where any embedding is detected
+     *
+     * @param  {DS.InternalModel} internalModel
+     * @return {Object}
+     */
+    getFirstEmbeddingParent: function getFirstEmbeddingParent(internalModel) {
+      var _this = this;
+
+      var embeddingParentRel = find['default'](internalModel._implicitRelationships, function (implicitRel) {
+        var members = implicitRel.members.toArray();
+        var parent = members[0];
+        var parentRel = parent._relationships.get(implicitRel.inverseKey);
+        return _this.isRelationshipEmbedded(_this.store, parent.type.modelName, parentRel.relationshipMeta);
+      });
+
+      if (embeddingParentRel) {
+        var parent = embeddingParentRel.members.toArray()[0];
+        var parentKey = embeddingParentRel.inverseKey;
+        var parentRel = parent._relationships.get(parentKey).relationshipMeta;
+        return { record: parent, relationship: parentRel };
+      }
     },
 
     /**
@@ -101146,7 +101229,7 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
       typeClass.eachRelationship(function (key, relationship) {
         if (relationship.kind === 'hasMany') {
           var ids = payload[key];
-          cache[key] = !Ember['default'].isNone(ids) ? Ember['default'].A(Ember['default'].keys(ids)) : Ember['default'].A();
+          cache[key] = !Ember['default'].isNone(ids) ? Ember['default'].A(Object.keys(ids)) : Ember['default'].A();
         }
       });
     },
@@ -101171,11 +101254,21 @@ define('emberfire/adapters/firebase', ['exports', 'ember', 'ember-data', 'emberf
      */
     _getKey: function _getKey(refOrSnapshot) {
       return typeof refOrSnapshot.key === 'function' ? refOrSnapshot.key() : refOrSnapshot.name();
+    },
+
+    /**
+     * We don't need background reloading, because firebase!
+     */
+    shouldBackgroundReloadRecord: function shouldBackgroundReloadRecord() {
+      return false;
+    },
+    shouldReloadAll: function shouldReloadAll() {
+      return false;
     }
   });
 
 });
-define('emberfire/initializers/emberfire', ['exports', 'ember', 'ember-data', 'firebase', 'emberfire/adapters/firebase', 'emberfire/serializers/firebase'], function (exports, Ember, DS, Firebase, FirebaseAdapter, FirebaseSerializer) {
+define('emberfire/initializers/emberfire', ['exports', 'ember', 'ember-data', 'firebase', 'emberfire/adapters/firebase', 'emberfire/serializers/firebase', 'lodash/collection/forEach'], function (exports, Ember, DS, Firebase, FirebaseAdapter, FirebaseSerializer, forEach) {
 
   'use strict';
 
@@ -101201,13 +101294,24 @@ define('emberfire/initializers/emberfire', ['exports', 'ember', 'ember-data', 'f
         DS['default'].Store.reopen({
           _emberfirePatched: true,
           push: function push() {
-            var record = this._super.apply(this, arguments);
-            var modelName = record.constructor.modelName;
-            var adapter = this.adapterFor(modelName);
-            if (adapter.recordWasPushed) {
-              adapter.recordWasPushed(this, modelName, record);
+            var _this = this;
+
+            var result = this._super.apply(this, arguments);
+            var records = result;
+
+            if (!Ember['default'].isArray(result)) {
+              records = [result];
             }
-            return record;
+
+            forEach['default'](records, function (record) {
+              var modelName = record.constructor.modelName;
+              var adapter = _this.adapterFor(modelName);
+              if (adapter.recordWasPushed) {
+                adapter.recordWasPushed(_this, modelName, record);
+              }
+            });
+
+            return result;
           },
 
           recordWillUnload: function recordWillUnload(record) {
@@ -101239,13 +101343,9 @@ define('emberfire/initializers/emberfire', ['exports', 'ember', 'ember-data', 'f
           },
 
           ref: function ref() {
-            if (this.__firebaseRef) {
-              return this.__firebaseRef;
-            }
-
             var adapter = this.store.adapterFor(this.constructor.modelName);
-            if (adapter._getRef) {
-              return adapter._getRef(this.constructor, this.id);
+            if (adapter._getAbsoluteRef) {
+              return adapter._getAbsoluteRef(this);
             }
           }
         });
@@ -101269,158 +101369,243 @@ define('emberfire/initializers/emberfire', ['exports', 'ember', 'ember-data', 'f
   };
 
 });
-define('emberfire/serializers/firebase', ['exports', 'ember', 'ember-data', 'lodash/collection/map'], function (exports, Ember, DS, map) {
+define('emberfire/serializers/firebase', ['exports', 'ember', 'ember-data', 'lodash/object/assign'], function (exports, Ember, DS, assign) {
 
   'use strict';
 
   var fmt = Ember['default'].String.fmt;
 
   /**
-    The Firebase serializer helps normalize relationships and can be extended on
-    a per model basis.
-  */
-  exports['default'] = DS['default'].JSONSerializer.extend(Ember['default'].Evented, {
+   * The Firebase serializer helps normalize relationships and can be extended on
+   * a per model basis.
+   */
+  exports['default'] = DS['default'].JSONSerializer.extend(DS['default'].EmbeddedRecordsMixin, {
+    isNewSerializerAPI: true,
 
-    //We need to account for Firebase turning key/value pairs with ids '1' and '0' into arrays
-    //See https://github.com/firebase/emberfire/issues/124
-    _normalizeNumberIDs: function _normalizeNumberIDs(hash, key) {
-      var newHash = [];
-      if (hash[key][0] === true) {
-        newHash.push('0');
-      }
-      if (hash[key][1] === true) {
-        newHash.push('1');
-      }
-      hash[key] = newHash;
-    },
-
-    normalizeHasMany: function normalizeHasMany(typeClass, hash, relationship) {
-      var key = relationship.key;
-      if (typeof hash[key] === 'object' && !Ember['default'].isArray(hash[key])) {
-        hash[key] = Ember['default'].keys(hash[key]);
-      }
-      //We need to account for Firebase turning key/value pairs with ids '1' and '0' into arrays
-      //See https://github.com/firebase/emberfire/issues/124
-      else if (Ember['default'].isArray(hash[key]) && hash[key].length < 3 && (hash[key][0] === true || hash[key][1] === true)) {
-        this._normalizeNumberIDs(hash, key);
-      } else if (Ember['default'].isArray(hash[key])) {
-        throw new Error(fmt('%@ relationship %@(\'%@\') must be a key/value map in Firebase. Example: { "%@": { "%@_id": true } }', [typeClass.toString(), relationship.kind, relationship.type, key, relationship.type]));
-      }
-    },
-
-    normalizeEmbeddedHasMany: function normalizeEmbeddedHasMany(typeClass, hash, relationship, ref) {
-      var key = relationship.key;
-      var embedded = hash[key];
-      var embeddedRef;
-      if (!hash[key]) {
-        return;
-      }
-      var modelName = typeClass.modelName;
-      ref = ref || this.store.adapterFor(modelName)._getRef(typeClass, hash.id);
-
-      for (var id in embedded) {
-        var payload = embedded[id];
-        if (payload !== null && typeof payload === 'object') {
-          payload.id = id;
-        }
-        embeddedRef = ref.child(key).child(id);
-        var embeddedTypeClass = this.store.modelFor(relationship.type);
-        var record = this.store.push(relationship.type, this.normalize(embeddedTypeClass, payload, embeddedRef));
-        record.__firebaseRef = embeddedRef;
-      }
-      hash[key] = Ember['default'].keys(hash[key]);
-    },
-
-    normalizeEmbeddedBelongsTo: function normalizeEmbeddedBelongsTo(typeClass, hash, relationship, ref) {
-      var key = relationship.key;
-      if (!hash[key]) {
-        return;
-      }
-
-      var modelName = typeClass.modelName;
-      ref = ref || this.store.adapterFor(modelName)._getRef(typeClass, hash.id);
-
-      var payload = hash[key];
-      if (typeof payload.id !== 'string') {
-        throw new Error(fmt('Embedded relationship "%@" of "%@" must contain an "id" property in the payload', [relationship.type, typeClass]));
-      }
-      var embeddedRef = ref.child(key);
-      var embeddedTypeClass = this.store.modelFor(relationship.type);
-      var record = this.store.push(relationship.type, this.normalize(embeddedTypeClass, payload, embeddedRef));
-      record.__firebaseRef = embeddedRef;
-
-      hash[key] = payload.id;
-    },
-
-    normalizeBelongsTo: Ember['default'].K,
     /**
-      Called after `extractSingle()`. This method checks the model
-      for `hasMany` relationships and makes sure the value is an object.
-      The object is then converted to an Array using `Ember.keys`
-    */
-    normalize: function normalize(typeClass, hash, ref) {
-      var serializer = this;
-      // Check if the model contains any 'hasMany' relationships
-      typeClass.eachRelationship(function (key, relationship) {
-        if (relationship.kind === 'hasMany') {
-          if (relationship.options.embedded) {
-            serializer.normalizeEmbeddedHasMany(typeClass, hash, relationship, ref);
-          } else {
-            serializer.normalizeHasMany(typeClass, hash, relationship);
+     * @override
+     */
+    extractRelationships: function extractRelationships(modelClass, payload) {
+      this.normalizeRelationships(modelClass, payload);
+
+      return this._super(modelClass, payload);
+    },
+
+    /**
+     * Normalizes `hasMany` relationship structure before passing
+     * to `JSONSerializer.extractRelationships`
+     *
+     * before:
+     *
+     * ```js
+     * {
+     *   comments: {
+     *     abc: true,
+     *     def: true,
+     *   }
+     * }
+     * ```
+     *
+     * after:
+     *
+     * ```js
+     * {
+     *   comments: [ 'abc', 'def' ]
+     * }
+     * ```
+     *
+     * Or for embedded objects:
+     *
+     * ```js
+     * {
+     *   comments: {
+     *     'abc': { body: 'a' },
+     *     'def': { body: 'd' )
+     *   }
+     * }
+     * ```
+     *
+     * these should become:
+     *
+     * ```js
+     * {
+     *   comments: [
+     *     {
+     *       id: 'abc',
+     *       body: 'a'
+     *     },
+     *     {
+     *       id: 'def',
+     *       body: 'd'
+     *     }
+     *   ]
+     * }
+     * ```
+     */
+    normalizeRelationships: function normalizeRelationships(modelClass, payload) {
+      var _this = this;
+
+      modelClass.eachRelationship(function (key, meta) {
+        if (meta.kind === 'hasMany') {
+          if (payload.hasOwnProperty(key)) {
+
+            // embedded
+            if (_this.hasDeserializeRecordsOption(key)) {
+              if (typeof payload[key] === 'object' && !Ember['default'].isArray(payload[key])) {
+                payload[key] = Object.keys(payload[key]).map(function (id) {
+                  return assign['default']({ id: id }, payload[key][id]);
+                });
+              } else if (Ember['default'].isArray(payload[key])) {
+                payload[key] = _this._addNumericIdsToEmbeddedArray(payload[key]);
+              } else {
+                throw new Error(fmt('%@ relationship %@(\'%@\') must contain embedded records with an `id`. Example: { "%@": { "%@_1": { "id": "%@_1" } } } instead got: %@', [modelClass.toString(), meta.kind, meta.type, key, meta.type, meta.type, JSON.stringify(payload[key])]));
+              }
+            }
+
+            // normalized
+            else {
+              if (typeof payload[key] === 'object' && !Ember['default'].isArray(payload[key])) {
+                payload[key] = Object.keys(payload[key]);
+              } else if (Ember['default'].isArray(payload[key])) {
+                payload[key] = _this._convertBooleanArrayToIds(payload[key]);
+              } else {
+                throw new Error(fmt('%@ relationship %@(\'%@\') must be a key/value map. Example: { "%@": { "%@_1": true } } instead got: %@', [modelClass.toString(), meta.kind, meta.type, key, meta.type, JSON.stringify(payload[key])]));
+              }
+            }
           }
-        } else {
-          if (relationship.options.embedded) {
-            serializer.normalizeEmbeddedBelongsTo(typeClass, hash, relationship, ref);
-          } else {
-            serializer.normalizeBelongsTo(typeClass, hash, relationship);
+
+          // hasMany property is not present
+          // server will not send a property which has no content
+          // (i.e. it will never send `comments: null`) so we need to
+          // force the empty relationship
+          else {
+            payload[key] = [];
+          }
+        }
+
+        if (meta.kind === 'belongsTo') {
+          if (!payload.hasOwnProperty(key)) {
+            // server wont send property if it was made null elsewhere
+            payload[key] = null;
           }
         }
       });
-      return this._super.apply(this, arguments);
     },
 
     /**
-      Called on a records returned from `find()` and all records
-      returned from `findAll()`
-       This method also checks for `embedded: true`, extracts the
-      embedded records, pushes them into the store, and then replaces
-      the records with an array of ids
-    */
-    extractSingle: function extractSingle(store, typeClass, payload) {
-      return this.normalize(typeClass, payload);
-    },
-
-    /**
-      Called after the adpter runs `findAll()` or `findMany()`. This method runs
-      `extractSingle()` on each item in the payload and as a result each item
-      will have `normalize()` called on it
-    */
-    extractArray: function extractArray(store, typeClass, payload) {
-      return map['default'](payload, function (item) {
-        return this.extractSingle(store, typeClass, item);
-      }, this);
-    },
-
-    /**
-      Overrides ember-data's `serializeHasMany` to serialize oneToMany
-      relationships.
-    */
-    serializeHasMany: function serializeHasMany(snapshot, json, relationship) {
-      var record = snapshot.record || snapshot;
-      var key = relationship.key;
-      var payloadKey = this.keyForRelationship ? this.keyForRelationship(key, 'hasMany') : key;
-      json[payloadKey] = Ember['default'].A(record.get(key)).mapBy('id');
-    },
-
-    serializeBelongsTo: function serializeBelongsTo(snapshot, json, relationship) {
-      this._super(snapshot, json, relationship);
-      var key = relationship.key;
-      // var payloadKey = this.keyForRelationship ? this.keyForRelationship(key, "belongsTo") : relationship.key;
-      if (typeof json[key] === 'undefined' || json[key] === '') {
-        delete json[key];
+     * Coerce arrays back into relationship arrays. When numeric ids are used
+     * the firebase server will send back arrays instead of object hashes in
+     * certain situations.
+     *
+     * See the conditions and reasoning here:
+     * https://www.firebase.com/docs/web/guide/understanding-data.html#section-arrays-in-firebase
+     *
+     * Stored in Firebase:
+     *
+     * ```json
+     * {
+     *   "0": true,
+     *   "1": true,
+     *   "3": true
+     * }
+     * ```
+     *
+     * Given back by the JS client:
+     *
+     * ```js
+     * [true, true, null, true]
+     * ```
+     *
+     * What we need:
+     *
+     * ```js
+     * [ "0", "1", "3" ]
+     * ```
+     *
+     * @param {Array} arr   Input array
+     * @return {Array}      Fixed array
+     * @private
+     */
+    _convertBooleanArrayToIds: function _convertBooleanArrayToIds(arr) {
+      var result = [];
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] === true) {
+          result.push('' + i);
+        } else if (typeof arr[i] === 'string') {
+          throw new Error('hasMany relationship contains invalid data, should be in the form: { comment_1: true, comment_2: true } but was ' + JSON.stringify(arr));
+        }
       }
-    }
+      return result;
+    },
 
+    /**
+     * Fix embedded array ids.
+     *
+     * Objects are stored in Firebase with their id in the key only:
+     *
+     * ```json
+     * {
+     *   "0": { obj0 },
+     *   "1": { obj1 },
+     *   "3": { obj3 }
+     * }
+     * ```
+     *
+     * Given back by the JS client:
+     *
+     * ```js
+     * [{ obj0 }, { obj1 }, null, { obj3 }]
+     * ```
+     *
+     * What we need:
+     *
+     * ```js
+     * [ { id: '0', ...obj0 }, { id: '1', ...obj1 }, { id: '3', ...obj3 } ]
+     * ```
+     *
+     * https://www.firebase.com/docs/web/guide/understanding-data.html#section-arrays-in-firebase
+     *
+     * @param {Array} arr   Input array
+     * @return {Array}      Fixed array
+     * @private
+     */
+    _addNumericIdsToEmbeddedArray: function _addNumericIdsToEmbeddedArray(arr) {
+      var result = [];
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i]) {
+          if (typeof arr[i] !== 'object') {
+            throw new Error(fmt('expecting embedded object hash but found %@', [JSON.stringify(arr[i])]));
+          }
+          result.push(assign['default']({ id: '' + i }, arr[i]));
+        }
+      }
+      return result;
+    },
+
+    /**
+     * Even when records are embedded, bypass EmbeddedRecordsMixin
+     * and invoke JSONSerializer's method which serializes to ids only.
+     *
+     * The adapter handles saving the embedded records via `r.save()`
+     * and ensures that dirty states and rollback work.
+     *
+     * Will not be neccesary when this issue is resolved:
+     *
+     * https://github.com/emberjs/data/issues/2487
+     *
+     * @override
+     */
+    serializeHasMany: function serializeHasMany(snapshot, json, relationship) {
+      DS['default'].JSONSerializer.prototype.serializeHasMany.call(this, snapshot, json, relationship);
+    },
+
+    /**
+     * @see #serializeHasMany
+     * @override
+     */
+    serializeBelongsTo: function serializeBelongsTo(snapshot, json, relationship) {
+      DS['default'].JSONSerializer.prototype.serializeBelongsTo.call(this, snapshot, json, relationship);
+    }
   });
 
 });

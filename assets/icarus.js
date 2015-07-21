@@ -2,12 +2,14 @@
 
 /* jshint ignore:end */
 
-define('icarus/adapters/application', ['exports', 'icarus/config/environment', 'firebase', 'emberfire/adapters/firebase'], function (exports, config, Firebase, FirebaseAdapter) {
+define('icarus/adapters/application', ['exports', 'ember', 'emberfire/adapters/firebase'], function (exports, Ember, FirebaseAdapter) {
 
   'use strict';
 
+  var inject = Ember['default'].inject;
+
   exports['default'] = FirebaseAdapter['default'].extend({
-    firebase: new Firebase['default'](config['default'].firebase)
+    firebase: inject.service()
   });
 
 });
@@ -1114,9 +1116,7 @@ define('icarus/services/session', ['exports', 'ember'], function (exports, Ember
 
     store: service(),
 
-    firebase: computed(function () {
-      return this.container.lookup('adapter:application').get('firebase');
-    }),
+    firebase: service(),
 
     currentUser: null,
 
@@ -3653,7 +3653,7 @@ define('icarus/tests/transitions.jshint', function () {
   });
 
 });
-define('icarus/tests/unit/adapters/application-test', ['ember-qunit'], function (ember_qunit) {
+define('icarus/tests/unit/adapters/application-test', ['ember', 'ember-qunit'], function (Ember, ember_qunit) {
 
   'use strict';
 
@@ -3661,7 +3661,14 @@ define('icarus/tests/unit/adapters/application-test', ['ember-qunit'], function 
 
   // Replace this with your real tests.
   ember_qunit.test('it exists', function (assert) {
-    var adapter = this.subject();
+    var firebase = Ember['default'].Object.create({
+      ref: function ref() {
+        return true;
+      }
+    });
+    var adapter = this.subject({
+      firebase: firebase
+    });
     assert.ok(adapter);
   });
 
@@ -4581,7 +4588,7 @@ catch(err) {
 if (runningTests) {
   require("icarus/tests/test-helper");
 } else {
-  require("icarus/app")["default"].create({"name":"icarus","version":"0.0.0+5b9b5342"});
+  require("icarus/app")["default"].create({"name":"icarus","version":"0.0.0+5e94ee34"});
 }
 
 /* jshint ignore:end */
