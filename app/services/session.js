@@ -8,9 +8,7 @@ export default Ember.Service.extend({
 
   store: service(),
 
-  firebase: computed(function() {
-    return this.container.lookup('adapter:application').get('firebase');
-  }),
+  firebase: service(),
 
   currentUser: null,
 
